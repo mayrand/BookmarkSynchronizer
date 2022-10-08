@@ -5,22 +5,22 @@ namespace BookmarkSynchronizer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+public class BookmarkController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<BookmarkController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public BookmarkController(ILogger<BookmarkController> logger)
     {
         _logger = logger;
     }
 
     [HttpGet]
-    public IEnumerable<WeatherForecast> Get()
+    public IEnumerable<Bookmark> Get()
     {
         var safari = new HtmlDocument();
         safari.DetectEncodingAndLoad(@"./Data/Safari.html");
