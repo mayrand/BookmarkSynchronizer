@@ -22,18 +22,31 @@ app.UseHttpsRedirection();
 
 app.MapGet("/", () =>
 {
-    var safariFile = @"./Data/Safari.html";
-    Folder currentFolder = null;
-    using var reader = new StreamReader(safariFile);
-    const string folder = @"<DT><H3 FOLDED>";
+    var safari = GetBookmarks(@"./Data/Safari.html");
+    var opera = GetBookmarks(@"./Data/Opera.html");
+    return;
+})
+.WithName("Get");
+
+app.Run();
+
+Folder GetBookmarks(string file)
+{
+    const string folder = @"<DT><H3 ";
     const string item = @"<DT><A HREF=""";
+    Folder currentFolder = null;
+    using var reader = new StreamReader(file);
     while (true)
     {
         var line = reader.ReadLine()?.TrimStart();
         if (line is null) break;
         if (line.StartsWith(folder))
         {
-            var newFolder = new Folder { Name = line.Substring(folder.Length, line.LastIndexOf('<') - folder.Length), Parent = currentFolder };
+            var newFolder = new Folder
+            {
+                Name = GetItemName(line, folder),
+                Parent = currentFolder
+            };
             currentFolder?.Items.Add(newFolder);
             currentFolder = newFolder;
         }
@@ -41,8 +54,8 @@ app.MapGet("/", () =>
         {
             var newBookmark = new Bookmark
             {
-                Url = line.Substring(item.Length, line.IndexOf(">", item.Length) - 1 - item.Length),
-                Name = line.Substring(line.IndexOf(">", item.Length) + 1, line.LastIndexOf('<') - line.IndexOf(">", item.Length) - 1)
+                Url = line.Substring(item.Length, line.IndexOf("\"", item.Length) - item.Length),
+                Name = GetItemName(line, item)
             };
             currentFolder.Items.Add(newBookmark);
             newBookmark.Parent = currentFolder;
@@ -53,8 +66,12 @@ app.MapGet("/", () =>
             currentFolder = currentFolder.Parent;
         }
     }
-    return;
-})
-.WithName("Get");
+    return currentFolder;
+}
 
-app.Run();
+string GetItemName(string line, string item)
+{
+    var start = line.IndexOf(">", item.Length) + 1;
+    var length = line.LastIndexOf('<') - line.IndexOf(">", item.Length) - 1;
+    return line.Substring(start, length);
+}
