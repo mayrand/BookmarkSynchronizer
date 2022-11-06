@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace BookmarkSynchronizerAPI;
 
 public sealed record Bookmark : Item
 {
     public string Url { get; set; }
-
     public string Name { get; set; }
-
     public Folder Parent { get; set; }
 }
 
@@ -18,7 +17,7 @@ public sealed record Folder : Item
     public Folder Parent { get; set; }
 }
 
-public interface Item { string Name { get; set; } Folder Parent { get; set; } }
+public interface Item { string Name { get; set; } [JsonIgnore] Folder Parent { get; set; } }
 
 public class ItemEqualityComparer : IEqualityComparer<Item>
 {
